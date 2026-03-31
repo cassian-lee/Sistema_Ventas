@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juth Sales — Sistema de Ventas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --bg:        #f5f5f7;
+      --bg2:       #ffffff;
+      --surface:   #ffffff;
+      --surface2:  #f0f0f5;
+      --border:    #e2e2ea;
+      --border2:   #d0d0dc;
+      --text:      #0d0d14;
+      --text2:     #4a4a68;
+      --muted:     #9090aa;
+      --accent:    #6c63ff;
+      --accent2:   #8b85ff;
+      --accent-soft: rgba(108,99,255,0.1);
+      --accent-glow: rgba(108,99,255,0.2);
+      --green:     #16a34a;
+      --green-bg:  rgba(22,163,74,0.08);
+      --red:       #dc2626;
+      --red-bg:    rgba(220,38,38,0.08);
+      --amber:     #d97706;
+      --amber-bg:  rgba(217,119,6,0.08);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow:    0 4px 16px rgba(0,0,0,.07);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.1);
+      --radius:    12px;
+      --radius-lg: 16px;
+      --nav-h:     64px;
+      --sidebar-w: 240px;
+    }
+    [data-theme="dark"] {
+      --bg:        #0c0c14;
+      --bg2:       #13131e;
+      --surface:   #16161f;
+      --surface2:  #1e1e2c;
+      --border:    #2a2a3c;
+      --border2:   #363650;
+      --text:      #f0f0f8;
+      --text2:     #a0a0c0;
+      --muted:     #5a5a78;
+      --accent:    #7c6af7;
+      --accent2:   #a89fff;
+      --accent-soft: rgba(124,106,247,0.12);
+      --accent-glow: rgba(124,106,247,0.22);
+      --green:     #22c55e;
+      --green-bg:  rgba(34,197,94,0.1);
+      --red:       #f43f5e;
+      --red-bg:    rgba(244,63,94,0.1);
+      --amber:     #f59e0b;
+      --amber-bg:  rgba(245,158,11,0.1);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+      --shadow:    0 4px 16px rgba(0,0,0,.4);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.5);
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      transition: background .25s, color .25s;
+    }
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius:4px; }
+
+    /* ── LAYOUT ── */
+    .app { display:flex; min-height:100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 200;
+      transition: transform .3s cubic-bezier(.4,0,.2,1), background .25s, border-color .25s;
+    }
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+    .logo-mark svg { width:18px; height:18px; }
+    .logo-name { font-size:15px; font-weight:800; letter-spacing:-.4px; color:var(--text); }
+    .logo-name span { display:block; font-size:10.5px; font-weight:500; color:var(--muted); letter-spacing:.2px; margin-top:1px; }
+
+    .sidebar-nav { flex:1; padding:12px 10px; overflow-y:auto; }
+    .nav-section-label {
+      font-size:10px; font-weight:700; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.8px;
+      padding: 8px 10px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap:10px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all .18s;
+      margin-bottom: 2px;
+      border: none; background: none; width: 100%; text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+    .nav-item svg { width:16px; height:16px; flex-shrink:0; }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight:600; }
+    .nav-item.active svg { stroke: var(--accent); }
+    .nav-item .nav-badge {
+      margin-left:auto;
+      background: var(--red-bg);
+      color: var(--red);
+      font-size:10px; font-weight:700;
+      padding:1px 7px; border-radius:20px;
+    }
+
+    .sidebar-footer {
+      padding: 14px 10px;
+      border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .theme-toggle {
+      display: flex; align-items: center; gap:10px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all .18s;
+      border: none; background: none; width: 100%; text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+    .theme-toggle:hover { background: var(--surface2); color: var(--text); }
+    .theme-toggle svg { width:16px; height:16px; }
+    .toggle-pill {
+      margin-left:auto;
+      width:34px; height:18px;
+      background: var(--border2);
+      border-radius:9px;
+      position:relative;
+      transition: background .2s;
+    }
+    .toggle-pill::after {
+      content:'';
+      position:absolute;
+      top:2px; left:2px;
+      width:14px; height:14px;
+      background:#fff;
+      border-radius:50%;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    [data-theme="dark"] .toggle-pill { background: var(--accent); }
+    [data-theme="dark"] .toggle-pill::after { transform: translateX(16px); }
+
+    /* ── TOPBAR (mobile) ── */
+    .topbar {
+      display: none;
+      position: fixed; top:0; left:0; right:0;
+      height: var(--nav-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      z-index: 150;
+      transition: background .25s, border-color .25s;
+    }
+    .topbar-logo { display:flex; align-items:center; gap:8px; flex:1; }
+    .topbar-logo .logo-name { font-size:14px; }
+    .menu-btn, .topbar-theme {
+      width:36px; height:36px;
+      border:none; background: var(--surface2);
+      border-radius:9px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      color: var(--text2);
+      transition: all .18s;
+    }
+    .menu-btn:hover, .topbar-theme:hover { background: var(--border); color: var(--text); }
+    .menu-btn svg, .topbar-theme svg { width:18px; height:18px; }
+    .overlay {
+      display:none;
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.4);
+      z-index:190;
+      backdrop-filter: blur(2px);
+    }
+    .overlay.show { display:block; }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex:1;
+      min-width:0;
+      transition: margin .3s;
+    }
+    .page { display:none; padding:32px; max-width:1100px; }
+    .page.active { display:block; }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      margin-bottom:28px; gap:16px; flex-wrap:wrap;
+    }
+    .page-title { font-size:22px; font-weight:800; letter-spacing:-.5px; }
+    .page-subtitle { font-size:13px; color:var(--muted); margin-top:3px; }
+
+    /* ── STAT CARDS ── */
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:28px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color .2s, transform .2s, box-shadow .2s, background .25s;
+      cursor: default;
+    }
+    .card:hover { border-color: var(--border2); transform:translateY(-2px); box-shadow: var(--shadow); }
+    .card-icon {
+      width:38px; height:38px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:14px;
+    }
+    .card-icon svg { width:18px; height:18px; }
+    .card-icon.purple { background:var(--accent-soft); color:var(--accent); }
+    .card-icon.green  { background:var(--green-bg);    color:var(--green); }
+    .card-icon.red    { background:var(--red-bg);      color:var(--red); }
+    .card-icon.amber  { background:var(--amber-bg);    color:var(--amber); }
+    .c-label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.7px; }
+    .c-val { font-size:26px; font-weight:800; letter-spacing:-.6px; margin-top:4px; }
+    .c-val.g { color:var(--green); }
+    .c-val.r { color:var(--red); }
+    .c-val.p { color:var(--accent); }
+    .c-trend { font-size:11.5px; color:var(--muted); margin-top:5px; display:flex; align-items:center; gap:4px; }
+    .c-trend svg { width:12px; height:12px; }
+    .c-trend.up { color:var(--green); }
+    .c-trend.down { color:var(--red); }
+
+    /* ── BOX ── */
+    .box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+      transition: background .25s, border-color .25s;
+    }
+    .box-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; gap:12px; flex-wrap:wrap; }
+    .box-title { font-size:14px; font-weight:700; color:var(--text); }
+    .box-subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
+
+    /* ── FORM ── */
+    .form-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+    .form-grid .full { grid-column:1/-1; }
+    .field label { display:block; font-size:11.5px; font-weight:600; color:var(--text2); margin-bottom:6px; }
+    .input-wrap { position:relative; }
+    .input-wrap svg { position:absolute; left:11px; top:50%; transform:translateY(-50%); width:15px; height:15px; color:var(--muted); pointer-events:none; }
+    .input-wrap input, .input-wrap select { padding-left:34px; }
+    input, select, textarea {
+      width:100%; padding:10px 13px;
+      border:1px solid var(--border);
+      border-radius:9px;
+      font-size:13.5px; font-family:'Inter',sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: border .2s, box-shadow .2s, background .25s;
+      appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color:var(--muted); }
+    input:focus, select:focus, textarea:focus {
+      outline:none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      background: var(--surface);
+    }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239090aa' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+    textarea { resize:vertical; min-height:80px; }
+    .form-actions { margin-top:20px; display:flex; gap:10px; flex-wrap:wrap; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display:inline-flex; align-items:center; gap:7px;
+      padding:9px 20px;
+      border:none; border-radius:9px; cursor:pointer;
+      font-size:13.5px; font-family:'Inter',sans-serif; font-weight:600;
+      transition: all .2s; white-space:nowrap;
+    }
+    .btn svg { width:15px; height:15px; }
+    .btn:active { transform:scale(.97); }
+    .btn-primary {
+      background: var(--accent);
+      color:#fff;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+    .btn-primary:hover { filter:brightness(1.1); box-shadow:0 6px 20px var(--accent-glow); transform:translateY(-1px); }
+    .btn-ghost { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
+    .btn-ghost:hover { background:var(--border); color:var(--text); }
+    .btn-success {
+      background: var(--green);
+      color:#fff;
+      box-shadow: 0 4px 14px rgba(22,163,74,.25);
+    }
+    .btn-success:hover { filter:brightness(1.08); transform:translateY(-1px); }
+    .btn-sm { padding:5px 12px; font-size:12px; border-radius:7px; }
+    .btn-sm svg { width:13px; height:13px; }
+    .btn-edit { background:var(--accent-soft); color:var(--accent); border:1px solid rgba(108,99,255,.15); }
+    .btn-edit:hover { background:rgba(108,99,255,.18); }
+    .btn-del { background:var(--red-bg); color:var(--red); border:1px solid rgba(220,38,38,.15); }
+    .btn-del:hover { background:rgba(220,38,38,.18); }
+
+    /* ── TABLE ── */
+    .table-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .search-field { position:relative; }
+    .search-field svg { position:absolute; left:11px; top:50%; transform:translateY(-50%); width:15px; height:15px; color:var(--muted); pointer-events:none; }
+    .search-field input { padding-left:34px; width:220px; }
+    .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th {
+      font-size:10.5px; font-weight:700; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.6px;
+      padding:10px 14px; border-bottom:1px solid var(--border);
+      text-align:left; white-space:nowrap; background:var(--surface);
+    }
+    td { padding:12px 14px; border-bottom:1px solid var(--border); color:var(--text2); vertical-align:middle; }
+    td.td-main { color:var(--text); font-weight:500; }
+    tr:last-child td { border-bottom:none; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover td { background:var(--surface2); }
+    .td-actions { display:flex; gap:6px; }
+
+    /* ── BADGES ── */
+    .badge {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:3px 9px; border-radius:20px;
+      font-size:11px; font-weight:700;
+    }
+    .badge-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+    .badge-green { background:var(--green-bg); color:var(--green); }
+    .badge-green .badge-dot { background:var(--green); }
+    .badge-red { background:var(--red-bg); color:var(--red); }
+    .badge-red .badge-dot { background:var(--red); }
+    .badge-amber { background:var(--amber-bg); color:var(--amber); }
+    .badge-amber .badge-dot { background:var(--amber); }
+
+    /* ── VENTAS ── */
+    .search-row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin-bottom:18px; }
+    .search-row > .field { flex:1; min-width:140px; }
+    .product-card {
+      background:var(--bg);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px 20px;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .pi-label { font-size:10.5px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+    .pi-val { font-size:15px; font-weight:700; margin-top:4px; }
+    .info-banner {
+      display:flex; align-items:center; gap:10px;
+      background:var(--amber-bg);
+      border:1px solid rgba(217,119,6,.2);
+      border-radius:9px;
+      padding:10px 14px;
+      font-size:12.5px; color:var(--amber);
+      margin-bottom:18px;
+    }
+    .info-banner svg { width:15px; height:15px; flex-shrink:0; }
+    .readonly-field {
+      font-weight:700; color:var(--green);
+      background:var(--green-bg) !important;
+      border-color:rgba(22,163,74,.2) !important;
+    }
+
+    /* ── REPORTES ── */
+    .filter-bar { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin-bottom:28px; }
+    .filter-bar .field { min-width:140px; }
+    .report-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; }
+    .r-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); font-size:13px; }
+    .r-row:last-child { border-bottom:none; }
+    .r-label { color:var(--text2); display:flex; align-items:center; gap:8px; }
+    .r-val { font-weight:700; color:var(--text); }
+    .rank {
+      width:22px; height:22px; border-radius:6px;
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700;
+      background:var(--surface2); color:var(--muted);
+      flex-shrink:0;
+    }
+    .rank.gold { background:rgba(251,191,36,.15); color:#d97706; }
+    .chart-placeholder {
+      background:var(--bg);
+      border:1px dashed var(--border2);
+      border-radius:10px;
+      height:140px;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:8px; color:var(--muted); font-size:12px;
+      margin-top:16px;
+    }
+    .chart-placeholder svg { width:28px; height:28px; opacity:.35; }
+
+    /* ── DIVIDER ── */
+    .divider { height:1px; background:var(--border); margin:20px 0; }
+
+    /* ── TOAST ── */
+    #toast-container { position:fixed; bottom:24px; right:24px; z-index:500; display:flex; flex-direction:column; gap:10px; }
+    .toast {
+      display:flex; align-items:center; gap:10px;
+      padding:12px 18px; border-radius:10px;
+      font-size:13px; font-weight:500;
+      box-shadow: var(--shadow-lg);
+      animation: toastIn .25s ease;
+      min-width:220px; max-width:320px;
+    }
+    .toast svg { width:16px; height:16px; flex-shrink:0; }
+    .toast-success { background:var(--green); color:#fff; }
+    .toast-error   { background:var(--red);   color:#fff; }
+    .toast-info    { background:var(--accent); color:#fff; }
+    @keyframes toastIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── PRODUCT CARD SELECTOR ── */
+    .prod-card-item:hover { border-color: var(--accent) !important; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+      .topbar { display:flex; }
+      .main { margin-left:0; padding-top: var(--nav-h); }
+      .page { padding:20px 16px; }
+      .cards { grid-template-columns:repeat(2,1fr); gap:10px; }
+      .c-val { font-size:22px; }
+      .form-grid { grid-template-columns:1fr; }
+      .search-field input { width:100%; }
+      .table-toolbar { flex-direction:column; align-items:stretch; }
+      .page-header { flex-direction:column; }
+      .filter-bar { flex-direction:column; }
+      .report-grid { grid-template-columns:1fr; }
+      .search-row { flex-direction:column; }
+      .search-row > .field { min-width:unset; }
+      .product-card { grid-template-columns:repeat(2,1fr); }
+      .box { padding:18px 16px; }
+    }
+    @media (max-width: 400px) {
+      .cards { grid-template-columns:1fr; }
+    }
+    @media print {
+      .sidebar, .topbar, .page-header .btn, #app-footer, #toast-container { display:none !important; }
+      .main { margin-left:0 !important; }
+      .page { display:none !important; padding:0; }
+      #reportes { display:block !important; }
+      .box { box-shadow:none; border:1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark" id="logo-mark-sidebar">
+      <img src="logo_venta.png" alt="Logo" style="width:36px;height:36px;border-radius:10px;object-fit:cover;display:block;"
+           onerror="this.style.display='none';document.getElementById('logo-fallback-sidebar').style.display='flex'"/>
+      <span id="logo-fallback-sidebar" style="display:none;align-items:center;justify-content:center;width:100%;height:100%;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </span>
+    </div>
+    <div class="logo-name">Juth Sales <span>Sistema de Ventas</span></div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <button class="nav-item active" onclick="showPage('inventario',this)" id="nav-inventario">
+      <i data-lucide="package"></i> Inventario
+      <span class="nav-badge">5</span>
+    </button>
+    <button class="nav-item" onclick="showPage('ventas',this)" id="nav-ventas">
+      <i data-lucide="shopping-cart"></i> Ventas
+    </button>
+    <button class="nav-item" onclick="showPage('reportes',this)" id="nav-reportes">
+      <i data-lucide="bar-chart-2"></i> Reportes
+    </button>
+    <button class="nav-item" onclick="showPage('reposicion',this)" id="nav-reposicion">
+      <i data-lucide="package-plus"></i> Reposición
+    </button>
+    <div class="nav-section-label" style="margin-top:12px">Cuenta</div>
+    <button class="nav-item">
+      <i data-lucide="settings"></i> Configuración
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <i data-lucide="sun" id="theme-icon-sidebar"></i>
+      <span id="theme-label-sidebar">Modo claro</span>
+      <div class="toggle-pill"></div>
+    </button>
+  </div>
+</aside>
+
+<!-- TOPBAR (mobile) -->
+<header class="topbar">
+  <button class="menu-btn" onclick="openSidebar()"><i data-lucide="menu"></i></button>
+  <div class="topbar-logo">
+    <div class="logo-mark" style="width:30px;height:30px;border-radius:8px;overflow:hidden;">
+      <img src="logo_venta.png" alt="Logo" style="width:30px;height:30px;object-fit:cover;display:block;"
+           onerror="this.style.display='none';document.getElementById('logo-fallback-top').style.display='flex'"/>
+      <span id="logo-fallback-top" style="display:none;align-items:center;justify-content:center;width:100%;height:100%;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </span>
+    </div>
+    <div class="logo-name" style="font-size:14px">Juth Sales</div>
+  </div>
+  <button class="topbar-theme" onclick="toggleTheme()"><i data-lucide="sun" id="theme-icon-top"></i></button>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ===== INVENTARIO ===== -->
+<section id="inventario" class="page active">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Inventario</h1>
+      <p class="page-subtitle">Gestiona tu stock de prendas en tiempo real</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal()"><i data-lucide="plus"></i> Nueva prenda</button>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon purple"><i data-lucide="package"></i></div>
+      <div class="c-label">Total prendas</div>
+      <div class="c-val p" id="stat-total">0</div>
+      <div class="c-trend" id="stat-total-sub">0 registros</div>
+    </div>
+    <div class="card">
+      <div class="card-icon amber"><i data-lucide="tag"></i></div>
+      <div class="c-label">Tipos registrados</div>
+      <div class="c-val" id="stat-tipos">0</div>
+      <div class="c-trend" id="stat-tipos-sub">categorías</div>
+    </div>
+    <div class="card">
+      <div class="card-icon green"><i data-lucide="dollar-sign"></i></div>
+      <div class="c-label">Valor en stock</div>
+      <div class="c-val g" id="stat-valor">S/ 0.00</div>
+      <div class="c-trend up"><i data-lucide="trending-up"></i> Precio compra × cant.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon red"><i data-lucide="alert-triangle"></i></div>
+      <div class="c-label">Stock bajo</div>
+      <div class="c-val r" id="stat-bajo">0</div>
+      <div class="c-trend down" id="stat-bajo-sub">prendas con ≤5 unidades</div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="table-toolbar">
+      <div>
+        <div class="box-title">Lista de inventario</div>
+        <div class="box-subtitle" id="inv-count">0 prendas registradas</div>
+      </div>
+      <div class="search-field">
+        <i data-lucide="search"></i>
+        <input type="text" id="inv-search" placeholder="Buscar prenda..." oninput="renderInventario()"/>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th><th>Marca</th><th>Modelo</th><th>Talla</th><th>Color</th>
+            <th>Cant.</th><th>P. Compra</th><th>P. Venta</th><th>Estado</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="inv-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL PRENDA -->
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+      <div>
+        <div class="box-title" id="modal-title">Nueva prenda</div>
+        <div class="box-subtitle">Completa los campos del formulario</div>
+      </div>
+      <button onclick="closeModal()" style="border:none;background:var(--surface2);border-radius:8px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);"><i data-lucide="x"></i></button>
+    </div>
+    <input type="hidden" id="f-id"/>
+    <div class="form-grid">
+      <div class="field">
+        <label>Tipo de prenda</label>
+        <select id="f-tipo"><option value="">-- Seleccionar --</option><option>Camiseta</option><option>Pantalón</option><option>Vestido</option><option>Chaqueta</option><option>Falda</option><option>Shorts</option><option>Zapatos</option><option>Otro</option></select>
+      </div>
+      <div class="field">
+        <label>Marca</label>
+        <div class="input-wrap"><i data-lucide="award"></i><input id="f-marca" type="text" placeholder="Ej: Nike, Zara..."/></div>
+      </div>
+      <div class="field">
+        <label>Modelo</label>
+        <div class="input-wrap"><i data-lucide="layers"></i><input id="f-modelo" type="text" placeholder="Ej: Slim Fit..." list="dl-modelos" autocomplete="off"/></div>
+        <datalist id="dl-modelos"></datalist>
+      </div>
+      <div class="field">
+        <label>Talla</label>
+        <select id="f-talla"><option value="">-- Seleccionar --</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>28</option><option>30</option><option>32</option><option>34</option><option>Única</option></select>
+      </div>
+      <div class="field">
+        <label>Color</label>
+        <div class="input-wrap"><i data-lucide="palette"></i><input id="f-color" type="text" placeholder="Ej: Negro, Blanco..." list="dl-colores" autocomplete="off"/></div>
+        <datalist id="dl-colores"></datalist>
+      </div>
+      <div class="field">
+        <label>Cantidad</label>
+        <div class="input-wrap"><i data-lucide="hash"></i><input id="f-cantidad" type="number" placeholder="0" min="0"/></div>
+      </div>
+      <div class="field">
+        <label>Precio de compra (S/)</label>
+        <div class="input-wrap"><i data-lucide="arrow-down-circle"></i><input id="f-compra" type="number" placeholder="0.00" step="0.01" min="0"/></div>
+      </div>
+      <div class="field">
+        <label>Precio de venta (S/)</label>
+        <div class="input-wrap"><i data-lucide="arrow-up-circle"></i><input id="f-venta" type="number" placeholder="0.00" step="0.01" min="0"/></div>
+      </div>
+      <div class="field full">
+        <label>Descripción (opcional)</label>
+        <textarea id="f-desc" placeholder="Detalles adicionales..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="guardarPrenda()"><i data-lucide="save"></i> Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal()"><i data-lucide="x"></i> Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VENTAS ===== -->
+<section id="ventas" class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Registrar Venta</h1>
+      <p class="page-subtitle">Procesa ventas y actualiza el stock automáticamente</p>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="box-header">
+      <div>
+        <div class="box-title">Seleccionar producto</div>
+        <div class="box-subtitle">Elige una prenda del inventario</div>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:16px">
+      <label>Buscar prenda</label>
+      <div class="input-wrap"><i data-lucide="search"></i><input id="v-search" type="text" placeholder="Escribe tipo, marca o modelo..." oninput="filtrarProductos()"/></div>
+    </div>
+    <div id="v-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:18px;max-height:260px;overflow-y:auto;"></div>
+
+    <div id="v-producto-panel" style="display:none">
+      <div class="product-card" id="v-producto-info"></div>
+      <div class="info-banner" id="v-costo-banner">
+        <i data-lucide="info"></i>
+        <span id="v-costo-text"></span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Cantidad a vender</label>
+          <div class="input-wrap"><i data-lucide="hash"></i><input id="v-cantidad" type="number" value="1" min="1" oninput="calcularVenta()"/></div>
+        </div>
+        <div class="field">
+          <label>Precio de venta (S/)</label>
+          <div class="input-wrap"><i data-lucide="tag"></i><input id="v-precio" type="number" step="0.01" min="0" oninput="calcularVenta()"/></div>
+        </div>
+        <div class="field">
+          <label>Total estimado</label>
+          <input id="v-total" type="text" readonly class="readonly-field"/>
+        </div>
+        <div class="field">
+          <label>Ganancia estimada</label>
+          <input id="v-ganancia" type="text" readonly class="readonly-field"/>
+        </div>
+        <div class="field full">
+          <label>Notas (opcional)</label>
+          <div class="input-wrap"><i data-lucide="message-square"></i><input id="v-notas" type="text" placeholder="Cliente, canal de venta, observaciones..."/></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-success" onclick="confirmarVenta()"><i data-lucide="check-circle"></i> Confirmar venta</button>
+        <button class="btn btn-ghost" onclick="cancelarVenta()"><i data-lucide="x"></i> Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="table-toolbar">
+      <div>
+        <div class="box-title">Historial de ventas</div>
+        <div class="box-subtitle" id="ventas-count">0 ventas registradas</div>
+      </div>
+      <div class="search-field">
+        <i data-lucide="search"></i>
+        <input type="text" id="ventas-search" placeholder="Buscar venta..." oninput="renderVentas()"/>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Prenda</th><th>Talla</th><th>Cant.</th><th>P. Compra</th><th>P. Venta</th><th>Total</th><th>Ganancia</th></tr>
+        </thead>
+        <tbody id="ventas-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REPORTES ===== -->
+<section id="reportes" class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Reportes</h1>
+      <p class="page-subtitle">Análisis de rendimiento y métricas del negocio</p>
+    </div>
+    <button class="btn btn-ghost" onclick="exportarPDF()"><i data-lucide="printer"></i> Exportar PDF</button>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon green"><i data-lucide="trending-up"></i></div>
+      <div class="c-label">Ingresos totales</div>
+      <div class="c-val g" id="r-ingresos">S/ 0.00</div>
+      <div class="c-trend" id="r-ingresos-sub">todas las ventas</div>
+    </div>
+    <div class="card">
+      <div class="card-icon red"><i data-lucide="shopping-bag"></i></div>
+      <div class="c-label">Costo total</div>
+      <div class="c-val r" id="r-costo">S/ 0.00</div>
+      <div class="c-trend" id="r-uds">0 unidades vendidas</div>
+    </div>
+    <div class="card">
+      <div class="card-icon purple"><i data-lucide="zap"></i></div>
+      <div class="c-label">Ganancia neta</div>
+      <div class="c-val g" id="r-ganancia">S/ 0.00</div>
+      <div class="c-trend" id="r-margen">Margen 0%</div>
+    </div>
+    <div class="card">
+      <div class="card-icon amber"><i data-lucide="target"></i></div>
+      <div class="c-label">Ticket promedio</div>
+      <div class="c-val" id="r-ticket">S/ 0.00</div>
+      <div class="c-trend" id="r-ticket-sub">por venta</div>
+    </div>
+  </div>
+
+  <div class="report-grid">
+    <div class="box" style="margin-bottom:0">
+      <div class="box-header"><div class="box-title">Ventas por tipo de prenda</div></div>
+      <div id="r-por-tipo"><p style="color:var(--muted);font-size:13px;padding:8px 0">Sin ventas registradas</p></div>
+    </div>
+
+    <div class="box" style="margin-bottom:0">
+      <div class="box-header"><div class="box-title">Productos más vendidos</div></div>
+      <div id="r-top-productos"><p style="color:var(--muted);font-size:13px;padding:8px 0">Sin ventas registradas</p></div>
+    </div>
+
+    <div class="box" style="margin-bottom:0">
+      <div class="box-header"><div class="box-title">Resumen financiero</div></div>
+      <div class="r-row"><span class="r-label">Ingresos totales</span><span class="r-val" style="color:var(--green)" id="rf-ingresos">S/ 0.00</span></div>
+      <div class="r-row"><span class="r-label">Costo de productos</span><span class="r-val" style="color:var(--red)" id="rf-costo">S/ 0.00</span></div>
+      <div class="r-row"><span class="r-label">Ganancia bruta</span><span class="r-val" style="color:var(--green)" id="rf-ganancia">S/ 0.00</span></div>
+      <div class="r-row"><span class="r-label">Margen promedio</span><span class="r-val" style="color:var(--accent)" id="rf-margen">0%</span></div>
+      <div class="r-row"><span class="r-label">Ticket promedio</span><span class="r-val" id="rf-ticket">S/ 0.00</span></div>
+    </div>
+
+    <div class="box" style="margin-bottom:0">
+      <div class="box-header"><div class="box-title">Stock crítico</div></div>
+      <div id="r-stock-critico"><p style="color:var(--muted);font-size:13px;padding:8px 0">Sin prendas en stock crítico</p></div>
+      <div style="margin-top:16px">
+        <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="showPage('inventario', document.getElementById('nav-inventario'))">
+          <i data-lucide="arrow-right"></i> Ver inventario completo
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REPOSICIÓN ===== -->
+<section id="reposicion" class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Reposición de Stock</h1>
+      <p class="page-subtitle">Registra entradas de mercancía y actualiza el inventario</p>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="box-header">
+      <div><div class="box-title">Agregar stock a una prenda</div><div class="box-subtitle">Selecciona la prenda y la cantidad recibida</div></div>
+    </div>
+    <div class="field" style="margin-bottom:16px">
+      <label>Buscar prenda</label>
+      <div class="input-wrap"><i data-lucide="search"></i><input id="rep-search" type="text" placeholder="Escribe tipo, marca o modelo..." oninput="filtrarReposicion()"/></div>
+    </div>
+    <div id="rep-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:18px;max-height:260px;overflow-y:auto;"></div>
+
+    <div id="rep-panel" style="display:none">
+      <div class="product-card" id="rep-info"></div>
+      <div class="form-grid" style="margin-top:16px">
+        <div class="field">
+          <label>Cantidad a ingresar</label>
+          <div class="input-wrap"><i data-lucide="plus-circle"></i><input id="rep-cantidad" type="number" value="1" min="1" placeholder="0"/></div>
+        </div>
+        <div class="field">
+          <label>Nuevo precio de compra (S/) <span style="color:var(--muted);font-weight:400">opcional</span></label>
+          <div class="input-wrap"><i data-lucide="arrow-down-circle"></i><input id="rep-compra" type="number" step="0.01" min="0" placeholder="Dejar vacío para mantener actual"/></div>
+        </div>
+        <div class="field full">
+          <label>Notas (opcional)</label>
+          <div class="input-wrap"><i data-lucide="message-square"></i><input id="rep-notas" type="text" placeholder="Proveedor, lote, observaciones..."/></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-success" onclick="confirmarReposicion()"><i data-lucide="check-circle"></i> Confirmar ingreso</button>
+        <button class="btn btn-ghost" onclick="cancelarReposicion()"><i data-lucide="x"></i> Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="box-header"><div class="box-title">Historial de reposiciones</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fecha</th><th>Prenda</th><th>Talla</th><th>Cant. ingresada</th><th>P. Compra</th><th>Notas</th></tr></thead>
+        <tbody id="rep-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+  // ── localStorage helpers ──
+  const LS_INV  = 'juth_inventario';
+  const LS_VEN  = 'juth_ventas';
+
+  function getInventario() { return JSON.parse(localStorage.getItem(LS_INV) || '[]'); }
+  function getVentas()     { return JSON.parse(localStorage.getItem(LS_VEN) || '[]'); }
+  function saveInventario(d) { localStorage.setItem(LS_INV, JSON.stringify(d)); }
+  function saveVentas(d)     { localStorage.setItem(LS_VEN, JSON.stringify(d)); }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+  function fmt(n) { return 'S/ ' + parseFloat(n||0).toFixed(2); }
+  function norm(s) { return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+
+  // ── INVENTARIO ──
+  function renderInventario() {
+    const inv    = getInventario();
+    const q      = norm(document.getElementById('inv-search').value);
+    const tbody  = document.getElementById('inv-tbody');
+    const filtered = inv.filter(p =>
+      norm([p.tipo,p.marca,p.modelo,p.talla,p.color].join(' ')).includes(q)
+    );
+
+    document.getElementById('inv-count').textContent = inv.length + ' prendas registradas';
+
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:28px">
+        ${inv.length ? 'Sin resultados para "'+q+'"' : 'No hay prendas. Agrega la primera.'}</td></tr>`;
+    } else {
+      tbody.innerHTML = filtered.map(p => {
+        const estado = p.cantidad <= 0
+          ? `<span class="badge badge-red"><span class="badge-dot"></span>Sin stock</span>`
+          : p.cantidad <= 5
+          ? `<span class="badge badge-red"><span class="badge-dot"></span>Stock bajo</span>`
+          : p.cantidad <= 10
+          ? `<span class="badge badge-amber"><span class="badge-dot"></span>Normal</span>`
+          : `<span class="badge badge-green"><span class="badge-dot"></span>En stock</span>`;
+        const cantColor = p.cantidad <= 5 ? 'color:var(--red)' : '';
+        return `<tr>
+          <td class="td-main">${p.tipo}</td>
+          <td>${p.marca}</td><td>${p.modelo}</td><td>${p.talla}</td><td>${p.color}</td>
+          <td><strong style="${cantColor}">${p.cantidad}</strong></td>
+          <td>${fmt(p.compra)}</td>
+          <td style="color:var(--green);font-weight:600">${fmt(p.venta)}</td>
+          <td>${estado}</td>
+          <td class="td-actions">
+            <button class="btn btn-sm btn-edit" onclick="editarPrenda('${p.id}')">
+              <i data-lucide="pencil"></i> Editar
+            </button>
+            <button class="btn btn-sm btn-del" onclick="eliminarPrenda('${p.id}')">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    actualizarStats();
+    lucide.createIcons();
+  }
+
+  function actualizarStats() {
+    const inv = getInventario();
+    const total  = inv.reduce((s,p) => s + p.cantidad, 0);
+    const tipos  = new Set(inv.map(p => p.tipo)).size;
+    const valor  = inv.reduce((s,p) => s + p.compra * p.cantidad, 0);
+    const bajo   = inv.filter(p => p.cantidad <= 5).length;
+
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-tipos').textContent = tipos;
+    document.getElementById('stat-valor').textContent = fmt(valor);
+    document.getElementById('stat-bajo').textContent  = bajo;
+    document.getElementById('stat-bajo-sub').textContent = bajo + ' prendas con ≤5 unidades';
+
+    // badge sidebar
+    const badge = document.querySelector('#nav-inventario .nav-badge');
+    if (badge) badge.textContent = bajo || '';
+    if (badge) badge.style.display = bajo ? '' : 'none';
+  }
+
+  // ── MODAL PRENDA ──
+  function openModal(id) {
+    const mo = document.getElementById('modal-overlay');
+    mo.style.display = 'flex';
+
+    // poblar sugerencias desde inventario existente
+    const inv = getInventario();
+    const modelos = [...new Set(inv.map(p => p.modelo).filter(Boolean))];
+    const colores = [...new Set(inv.map(p => p.color).filter(Boolean))];
+    document.getElementById('dl-modelos').innerHTML = modelos.map(m => `<option value="${m}">`).join('');
+    document.getElementById('dl-colores').innerHTML = colores.map(c => `<option value="${c}">`).join('');
+    if (id) {
+      const p = getInventario().find(x => x.id === id);
+      document.getElementById('modal-title').textContent = 'Editar prenda';
+      document.getElementById('f-id').value       = p.id;
+      document.getElementById('f-tipo').value     = p.tipo;
+      document.getElementById('f-marca').value    = p.marca;
+      document.getElementById('f-modelo').value   = p.modelo;
+      document.getElementById('f-talla').value    = p.talla;
+      document.getElementById('f-color').value    = p.color;
+      document.getElementById('f-cantidad').value = p.cantidad;
+      document.getElementById('f-compra').value   = p.compra;
+      document.getElementById('f-venta').value    = p.venta;
+      document.getElementById('f-desc').value     = p.desc || '';
+    } else {
+      document.getElementById('modal-title').textContent = 'Nueva prenda';
+      ['f-id','f-tipo','f-marca','f-modelo','f-talla','f-color','f-cantidad','f-compra','f-venta','f-desc']
+        .forEach(id => document.getElementById(id).value = '');
+    }
+    lucide.createIcons();
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').style.display = 'none';
+  }
+
+  function huella(p) {
+    return [p.tipo, p.marca, p.modelo, p.talla, p.color].map(x => norm(x||'')).join('|');
+  }
+
+  function guardarPrenda() {
+    const tipo     = document.getElementById('f-tipo').value;
+    const marca    = document.getElementById('f-marca').value.trim();
+    const modelo   = document.getElementById('f-modelo').value.trim();
+    const talla    = document.getElementById('f-talla').value;
+    const color    = document.getElementById('f-color').value.trim();
+    const cantidad = parseInt(document.getElementById('f-cantidad').value);
+    const compra   = parseFloat(document.getElementById('f-compra').value);
+    const venta    = parseFloat(document.getElementById('f-venta').value);
+    const desc     = document.getElementById('f-desc').value.trim();
+
+    if (!tipo || !marca || !talla || isNaN(cantidad) || isNaN(compra) || isNaN(venta)) {
+      toast('Completa todos los campos obligatorios.', 'error'); return;
+    }
+
+    const inv = getInventario();
+    const existingId = document.getElementById('f-id').value;
+
+    // si es edición, no verificar duplicado contra sí mismo
+    if (!existingId) {
+      const clave = huella({ tipo, marca, modelo, talla, color });
+      const duplicado = inv.find(p => huella(p) === clave);
+      if (duplicado) {
+        closeModal();
+        showDuplicado(duplicado, { tipo, marca, modelo, talla, color, cantidad, compra, venta, desc });
+        return;
+      }
+    }
+
+    _guardarPrendaFinal({ existingId, tipo, marca, modelo, talla, color, cantidad, compra, venta, desc });
+  }
+
+  function _guardarPrendaFinal({ existingId, tipo, marca, modelo, talla, color, cantidad, compra, venta, desc }) {
+    const inv = getInventario();
+    if (existingId) {
+      const idx = inv.findIndex(p => p.id === existingId);
+      inv[idx] = { ...inv[idx], tipo, marca, modelo, talla, color, cantidad, compra, venta, desc };
+    } else {
+      inv.push({ id: uid(), tipo, marca, modelo, talla, color, cantidad, compra, venta, desc });
+    }
+    saveInventario(inv);
+    closeModal();
+    renderInventario();
+    filtrarProductos();
+    toast('Prenda guardada correctamente.');
+  }
+
+  function showDuplicado(existente, nueva) {
+    document.getElementById('dup-info').innerHTML =
+      `<strong>${existente.tipo} ${existente.marca} ${existente.modelo}</strong> · ${existente.talla} · ${existente.color}
+       <br><span style="color:var(--muted);font-size:12px">Stock actual: <strong style="color:var(--accent)">${existente.cantidad} unidades</strong> · P. compra: ${fmt(existente.compra)}</span>`;
+    document.getElementById('dup-nueva-cant').textContent = nueva.cantidad;
+    const modal = document.getElementById('dup-modal');
+    modal.style.display = 'flex';
+
+    document.getElementById('dup-sumar').onclick = () => {
+      modal.style.display = 'none';
+      // sumar stock vía reposición interna
+      const inv = getInventario();
+      const idx = inv.findIndex(p => p.id === existente.id);
+      inv[idx].cantidad += nueva.cantidad;
+      if (nueva.compra !== existente.compra) inv[idx].compra = nueva.compra;
+      saveInventario(inv);
+      // registrar en historial de reposición
+      const reps = getReposiciones();
+      reps.unshift({ id: uid(), fecha: new Date().toLocaleDateString('es-PE'), prenda: `${existente.tipo} ${existente.marca} ${existente.modelo}`.trim(), talla: existente.talla, cantidad: nueva.cantidad, compra: inv[idx].compra, notas: 'Ingresado desde "Nueva prenda"' });
+      saveReposiciones(reps);
+      renderInventario();
+      renderReposiciones();
+      filtrarProductos();
+      toast(`+${nueva.cantidad} unidades sumadas al stock existente.`);
+    };
+
+    document.getElementById('dup-crear').onclick = () => {
+      modal.style.display = 'none';
+      _guardarPrendaFinal({ existingId: null, ...nueva });
+    };
+
+    document.getElementById('dup-cancelar').onclick = () => {
+      modal.style.display = 'none';
+    };
+  }
+
+  function editarPrenda(id)    { openModal(id); }
+
+  function eliminarPrenda(id) {
+    showConfirm('¿Eliminar esta prenda del inventario?', () => {
+      saveInventario(getInventario().filter(p => p.id !== id));
+      renderInventario();
+      filtrarProductos();
+    });
+  }
+
+  // ── TOAST ──
+  function toast(msg, type='success') {
+    const icons = { success:'check-circle', error:'alert-circle', info:'info' };
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.innerHTML = `<i data-lucide="${icons[type]||'info'}"></i><span>${msg}</span>`;
+    document.getElementById('toast-container').appendChild(el);
+    lucide.createIcons();
+    setTimeout(() => el.remove(), 3200);
+  }
+
+  // ── EXPORTAR PDF ──
+  function exportarPDF() {
+    window.print();
+  }
+
+  // ── REPOSICIÓN ──
+  const LS_REP = 'juth_reposicion';
+  function getReposiciones() { return JSON.parse(localStorage.getItem(LS_REP) || '[]'); }
+  function saveReposiciones(d) { localStorage.setItem(LS_REP, JSON.stringify(d)); }
+
+  let repProductoId = null;
+
+  function filtrarReposicion() {
+    const q   = norm(document.getElementById('rep-search').value);
+    const inv = getInventario();
+    const res = q ? inv.filter(p => norm([p.tipo,p.marca,p.modelo,p.talla,p.color].join(' ')).includes(norm(q))) : inv;
+    const lista = document.getElementById('rep-lista');
+    if (!res.length) {
+      lista.innerHTML = `<p style="color:var(--muted);font-size:13px;padding:8px 0;grid-column:1/-1">Sin resultados.</p>`;
+      return;
+    }
+    lista.innerHTML = res.map(p => `
+      <div onclick="seleccionarReposicion('${p.id}')" style="
+        background:var(--bg);border:1px solid var(--border);border-radius:10px;
+        padding:14px;cursor:pointer;transition:all .18s;
+      " onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-weight:700;font-size:13px;color:var(--text)">${p.tipo} ${p.marca}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${p.modelo} · ${p.talla} · ${p.color}</div>
+        <div style="margin-top:8px">
+          <span class="badge ${p.cantidad<=5?'badge-red':'badge-green'}">
+            <span class="badge-dot"></span>${p.cantidad} uds en stock
+          </span>
+        </div>
+      </div>`).join('');
+    lucide.createIcons();
+  }
+
+  function seleccionarReposicion(id) {
+    repProductoId = id;
+    const p = getInventario().find(x => x.id === id);
+    document.getElementById('rep-panel').style.display = 'block';
+    document.getElementById('rep-info').innerHTML = `
+      <div><div class="pi-label">Prenda</div><div class="pi-val">${p.tipo} ${p.marca}</div></div>
+      <div><div class="pi-label">Modelo</div><div class="pi-val">${p.modelo||'—'}</div></div>
+      <div><div class="pi-label">Talla / Color</div><div class="pi-val">${p.talla} / ${p.color}</div></div>
+      <div><div class="pi-label">Stock actual</div><div class="pi-val" style="color:var(--accent)">${p.cantidad} unidades</div></div>
+    `;
+    document.getElementById('rep-cantidad').value = 1;
+    document.getElementById('rep-compra').value   = '';
+    document.getElementById('rep-notas').value    = '';
+    lucide.createIcons();
+  }
+
+  function confirmarReposicion() {
+    if (!repProductoId) { toast('Selecciona una prenda primero.', 'error'); return; }
+    const inv = getInventario();
+    const idx = inv.findIndex(x => x.id === repProductoId);
+    const p   = inv[idx];
+    const qty = parseInt(document.getElementById('rep-cantidad').value);
+    const nuevoPrecio = parseFloat(document.getElementById('rep-compra').value);
+    const notas = document.getElementById('rep-notas').value.trim();
+
+    if (!qty || qty < 1) { toast('Ingresa una cantidad válida.', 'error'); return; }
+
+    inv[idx].cantidad += qty;
+    if (!isNaN(nuevoPrecio) && nuevoPrecio > 0) inv[idx].compra = nuevoPrecio;
+    saveInventario(inv);
+
+    const reps = getReposiciones();
+    reps.unshift({ id: uid(), fecha: new Date().toLocaleDateString('es-PE'), prenda: `${p.tipo} ${p.marca} ${p.modelo}`.trim(), talla: p.talla, cantidad: qty, compra: inv[idx].compra, notas });
+    saveReposiciones(reps);
+
+    renderInventario();
+    renderReposiciones();
+    cancelarReposicion();
+    toast(`+${qty} unidades ingresadas a ${p.tipo} ${p.marca}`);
+  }
+
+  function cancelarReposicion() {
+    repProductoId = null;
+    document.getElementById('rep-panel').style.display = 'none';
+    document.getElementById('rep-search').value = '';
+    filtrarReposicion();
+  }
+
+  function renderReposiciones() {
+    const reps  = getReposiciones();
+    const tbody = document.getElementById('rep-tbody');
+    if (!reps.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">Sin reposiciones registradas aún.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = reps.map(r => `<tr>
+      <td style="color:var(--muted)">${r.fecha}</td>
+      <td class="td-main">${r.prenda}</td>
+      <td>${r.talla}</td>
+      <td style="color:var(--green);font-weight:700">+${r.cantidad}</td>
+      <td>${fmt(r.compra)}</td>
+      <td style="color:var(--muted)">${r.notas||'—'}</td>
+    </tr>`).join('');
+  }
+  function showConfirm(msg, onOk) {
+    document.getElementById('confirm-msg').textContent = msg;
+    const modal = document.getElementById('confirm-modal');
+    modal.style.display = 'flex';
+    document.getElementById('confirm-ok').onclick = () => {
+      modal.style.display = 'none';
+      onOk();
+    };
+    document.getElementById('confirm-cancel').onclick = () => {
+      modal.style.display = 'none';
+    };
+  }
+
+  // ── VENTAS ──
+  let ventaProductoId = null;
+
+  function filtrarProductos() {
+    const q   = norm(document.getElementById('v-search').value);
+    const inv = getInventario().filter(p => p.cantidad > 0);
+    const res = q ? inv.filter(p =>
+      norm([p.tipo,p.marca,p.modelo,p.talla,p.color].join(' ')).includes(norm(q))
+    ) : inv;
+
+    const lista = document.getElementById('v-lista');
+    if (!res.length) {
+      lista.innerHTML = `<p style="color:var(--muted);font-size:13px;padding:8px 0;grid-column:1/-1">
+        ${inv.length ? 'Sin resultados.' : 'No hay prendas con stock disponible.'}</p>`;
+      return;
+    }
+    lista.innerHTML = res.map(p => `
+      <div onclick="seleccionarProducto('${p.id}')" style="
+        background:var(--bg);border:1px solid var(--border);border-radius:10px;
+        padding:14px;cursor:pointer;transition:all .18s;
+      " onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-weight:700;font-size:13px;color:var(--text)">${p.tipo} ${p.marca}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${p.modelo} · ${p.talla} · ${p.color}</div>
+        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--green);font-weight:600">${fmt(p.venta)}</span>
+          <span class="badge ${p.cantidad<=5?'badge-red':'badge-green'}">
+            <span class="badge-dot"></span>${p.cantidad} uds
+          </span>
+        </div>
+      </div>`).join('');
+    lucide.createIcons();
+  }
+
+  function seleccionarProducto(id) {
+    ventaProductoId = id;
+    const p = getInventario().find(x => x.id === id);
+    document.getElementById('v-producto-panel').style.display = 'block';
+    document.getElementById('v-producto-info').innerHTML = `
+      <div><div class="pi-label">Prenda</div><div class="pi-val">${p.tipo} ${p.marca}</div></div>
+      <div><div class="pi-label">Modelo</div><div class="pi-val">${p.modelo||'—'}</div></div>
+      <div><div class="pi-label">Talla / Color</div><div class="pi-val">${p.talla} / ${p.color}</div></div>
+      <div><div class="pi-label">Stock disponible</div><div class="pi-val" style="color:var(--green)">${p.cantidad} unidades</div></div>
+    `;
+    document.getElementById('v-costo-text').innerHTML =
+      `Precio de compra: <strong>${fmt(p.compra)}</strong> &mdash; margen mínimo sugerido: ${fmt(p.compra + 0.01)}+`;
+    document.getElementById('v-cantidad').value = 1;
+    document.getElementById('v-cantidad').max   = p.cantidad;
+    document.getElementById('v-precio').value   = p.venta;
+    document.getElementById('v-notas').value    = '';
+    calcularVenta();
+    lucide.createIcons();
+  }
+
+  function calcularVenta() {
+    if (!ventaProductoId) return;
+    const p   = getInventario().find(x => x.id === ventaProductoId);
+    const qty = parseFloat(document.getElementById('v-cantidad').value) || 0;
+    const pv  = parseFloat(document.getElementById('v-precio').value)   || 0;
+    const total    = qty * pv;
+    const ganancia = qty * (pv - p.compra);
+    document.getElementById('v-total').value    = fmt(total);
+    document.getElementById('v-ganancia').value = fmt(ganancia);
+  }
+
+  function confirmarVenta() {
+    if (!ventaProductoId) { toast('Selecciona un producto primero.', 'error'); return; }
+    const inv = getInventario();
+    const idx = inv.findIndex(x => x.id === ventaProductoId);
+    const p   = inv[idx];
+    const qty = parseInt(document.getElementById('v-cantidad').value);
+    const pv  = parseFloat(document.getElementById('v-precio').value);
+    const notas = document.getElementById('v-notas').value.trim();
+
+    if (!qty || qty < 1)          { toast('Cantidad inválida.', 'error'); return; }
+    if (qty > p.cantidad)         { toast('Stock insuficiente.', 'error'); return; }
+    if (!pv || pv <= 0)           { toast('Precio de venta inválido.', 'error'); return; }
+
+    // descontar stock
+    inv[idx].cantidad -= qty;
+    saveInventario(inv);
+
+    // registrar venta
+    const ventas = getVentas();
+    ventas.unshift({
+      id: uid(),
+      fecha: new Date().toLocaleDateString('es-PE'),
+      prenda: `${p.tipo} ${p.marca} ${p.modelo}`.trim(),
+      talla: p.talla,
+      cantidad: qty,
+      compra: p.compra,
+      venta: pv,
+      total: qty * pv,
+      ganancia: qty * (pv - p.compra),
+      notas
+    });
+    saveVentas(ventas);
+
+    cancelarVenta();
+    renderInventario();
+    renderVentas();
+    renderReportes();
+    toast('Venta registrada correctamente.');
+  }
+
+  function cancelarVenta() {
+    ventaProductoId = null;
+    document.getElementById('v-producto-panel').style.display = 'none';
+    document.getElementById('v-search').value = '';
+    filtrarProductos();
+  }
+
+  function renderVentas() {
+    const ventas   = getVentas();
+    const q        = norm(document.getElementById('ventas-search').value);
+    const filtered = ventas.filter(v =>
+      norm([v.prenda, v.talla, v.fecha, v.notas||''].join(' ')).includes(q)
+    );
+    document.getElementById('ventas-count').textContent = ventas.length + ' ventas registradas';
+    const tbody = document.getElementById('ventas-tbody');
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:28px">
+        ${ventas.length ? 'Sin resultados.' : 'No hay ventas registradas aún.'}</td></tr>`;
+    } else {
+      tbody.innerHTML = filtered.map(v => `<tr>
+        <td style="color:var(--muted)">${v.fecha}</td>
+        <td class="td-main">${v.prenda}</td>
+        <td>${v.talla}</td><td>${v.cantidad}</td>
+        <td>${fmt(v.compra)}</td><td>${fmt(v.venta)}</td>
+        <td style="font-weight:600">${fmt(v.total)}</td>
+        <td style="color:var(--green);font-weight:700">+${fmt(v.ganancia)}</td>
+      </tr>`).join('');
+    }
+  }
+
+  // ── REPORTES ──
+  function renderReportes() {
+    const ventas = getVentas();
+    const inv    = getInventario();
+
+    const ingresos = ventas.reduce((s,v) => s + v.total, 0);
+    const costo    = ventas.reduce((s,v) => s + v.compra * v.cantidad, 0);
+    const ganancia = ingresos - costo;
+    const uds      = ventas.reduce((s,v) => s + v.cantidad, 0);
+    const margen   = ingresos > 0 ? Math.round((ganancia/ingresos)*100) : 0;
+    const ticket   = ventas.length > 0 ? ingresos / ventas.length : 0;
+
+    document.getElementById('r-ingresos').textContent    = fmt(ingresos);
+    document.getElementById('r-costo').textContent       = fmt(costo);
+    document.getElementById('r-ganancia').textContent    = fmt(ganancia);
+    document.getElementById('r-uds').textContent         = uds + ' unidades vendidas';
+    document.getElementById('r-margen').textContent      = 'Margen ' + margen + '%';
+    document.getElementById('r-ticket').textContent      = fmt(ticket);
+    document.getElementById('rf-ingresos').textContent   = fmt(ingresos);
+    document.getElementById('rf-costo').textContent      = fmt(costo);
+    document.getElementById('rf-ganancia').textContent   = fmt(ganancia);
+    document.getElementById('rf-margen').textContent     = margen + '%';
+    document.getElementById('rf-ticket').textContent     = fmt(ticket);
+
+    // por tipo
+    const porTipo = {};
+    ventas.forEach(v => {
+      const tipo = v.prenda.split(' ')[0];
+      if (!porTipo[tipo]) porTipo[tipo] = { total:0, uds:0 };
+      porTipo[tipo].total += v.total;
+      porTipo[tipo].uds   += v.cantidad;
+    });
+    const tipoEl = document.getElementById('r-por-tipo');
+    const tipoEntries = Object.entries(porTipo).sort((a,b) => b[1].total - a[1].total);
+    tipoEl.innerHTML = tipoEntries.length
+      ? tipoEntries.map(([t,d]) => `
+          <div class="r-row">
+            <span class="r-label">${t}</span>
+            <span class="r-val" style="color:var(--accent)">${fmt(d.total)} <span style="color:var(--muted);font-weight:400">(${d.uds} uds)</span></span>
+          </div>`).join('')
+      : '<p style="color:var(--muted);font-size:13px;padding:8px 0">Sin ventas registradas</p>';
+
+    // top productos
+    const porProd = {};
+    ventas.forEach(v => {
+      if (!porProd[v.prenda]) porProd[v.prenda] = 0;
+      porProd[v.prenda] += v.cantidad;
+    });
+    const topEl = document.getElementById('r-top-productos');
+    const topEntries = Object.entries(porProd).sort((a,b) => b[1]-a[1]).slice(0,5);
+    topEl.innerHTML = topEntries.length
+      ? topEntries.map(([nombre,uds],i) => `
+          <div class="r-row">
+            <span class="r-label">
+              <span class="rank ${i<3?'gold':''}">${i+1}</span> ${nombre}
+            </span>
+            <span class="r-val" style="${i===0?'color:var(--amber)':''}">${uds} uds</span>
+          </div>`).join('')
+      : '<p style="color:var(--muted);font-size:13px;padding:8px 0">Sin ventas registradas</p>';
+
+    // stock crítico
+    const criticos = inv.filter(p => p.cantidad <= 5).sort((a,b) => a.cantidad - b.cantidad);
+    const criticoEl = document.getElementById('r-stock-critico');
+    criticoEl.innerHTML = criticos.length
+      ? criticos.map(p => `
+          <div class="r-row">
+            <span class="r-label">${p.tipo} ${p.marca} ${p.modelo} ${p.talla}</span>
+            <span class="badge ${p.cantidad===0?'badge-red':p.cantidad<=3?'badge-red':'badge-amber'}">
+              <span class="badge-dot"></span>${p.cantidad} uds
+            </span>
+          </div>`).join('')
+      : '<p style="color:var(--muted);font-size:13px;padding:8px 0">Sin prendas en stock crítico</p>';
+  }
+
+  // ── NAV ──
+  function showPage(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (id === 'reportes') renderReportes();
+    closeSidebar();
+  }
+
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('overlay').classList.add('show');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  // ── THEME ──
+  function toggleTheme() {
+    const html  = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    localStorage.setItem('juth_theme', isDark ? 'light' : 'dark');
+    updateThemeIcons(!isDark);
+  }
+  function updateThemeIcons(isDark) {
+    const icon = isDark ? 'moon' : 'sun';
+    document.getElementById('theme-label-sidebar').textContent = isDark ? 'Modo oscuro' : 'Modo claro';
+    document.getElementById('theme-icon-sidebar').setAttribute('data-lucide', icon);
+    document.getElementById('theme-icon-top').setAttribute('data-lucide', icon);
+    lucide.createIcons();
+  }
+
+  // ── INIT ──
+  (function init() {
+    // restaurar tema
+    const savedTheme = localStorage.getItem('juth_theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      if (savedTheme === 'dark') updateThemeIcons(true);
+    }
+
+    // datos de ejemplo al primer arranque
+    if (!localStorage.getItem('juth_seeded')) {
+      const ejemploInv = [
+        { id: uid(), tipo:'Camiseta', marca:'Nike', modelo:'Dri-Fit', talla:'M', color:'Negro', cantidad:12, compra:35, venta:65, desc:'' },
+        { id: uid(), tipo:'Camiseta', marca:'Adidas', modelo:'Classic', talla:'L', color:'Blanco', cantidad:8, compra:30, venta:55, desc:'' },
+        { id: uid(), tipo:'Pantalón', marca:'Levi\'s', modelo:'511 Slim', talla:'32', color:'Azul', cantidad:5, compra:80, venta:150, desc:'' },
+        { id: uid(), tipo:'Pantalón', marca:'Zara', modelo:'Chino', talla:'30', color:'Beige', cantidad:3, compra:60, venta:110, desc:'' },
+        { id: uid(), tipo:'Chaqueta', marca:'Adidas', modelo:'Track', talla:'XL', color:'Negro', cantidad:4, compra:120, venta:220, desc:'' },
+        { id: uid(), tipo:'Shorts', marca:'Nike', modelo:'Flex', talla:'S', color:'Gris', cantidad:2, compra:25, venta:50, desc:'' },
+        { id: uid(), tipo:'Vestido', marca:'Zara', modelo:'Floral', talla:'M', color:'Rojo', cantidad:6, compra:55, venta:100, desc:'' },
+      ];
+      const ejemploVentas = [
+        { id: uid(), fecha: new Date().toLocaleDateString('es-PE'), prenda:'Camiseta Nike Dri-Fit', talla:'M', cantidad:2, compra:35, venta:65, total:130, ganancia:60, notas:'Cliente frecuente' },
+        { id: uid(), fecha: new Date().toLocaleDateString('es-PE'), prenda:'Pantalón Levi\'s 511 Slim', talla:'32', cantidad:1, compra:80, venta:150, total:150, ganancia:70, notas:'' },
+      ];
+      saveInventario(ejemploInv);
+      saveVentas(ejemploVentas);
+      localStorage.setItem('juth_seeded', '1');
+    }
+
+    lucide.createIcons();
+    renderInventario();
+    renderVentas();
+    renderReposiciones();
+    filtrarProductos();
+    filtrarReposicion();
+  })();
+</script>
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- FOOTER -->
+<footer style="margin-left:var(--sidebar-w);padding:18px 32px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;transition:margin .3s;" id="app-footer">
+  <span style="font-size:12px;color:var(--muted);">© 2026 Juth Sales · Todos los derechos reservados</span>
+  <span style="color:var(--border2);">·</span>
+  <span style="font-size:12px;color:var(--muted);">Desarrollado por <strong style="color:var(--text2);font-weight:600;">Juth Morales</strong></span>
+</footer>
+<style>
+  @media (max-width: 768px) {
+    #app-footer { margin-left: 0; padding: 16px; }
+  }
+</style>
+
+<!-- MODAL DUPLICADO -->
+<div id="dup-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:420px;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--amber-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i data-lucide="copy" style="width:18px;height:18px;color:var(--amber);"></i>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">Prenda ya existe</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:2px">Esta combinación ya está en tu inventario</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:9px;padding:14px;margin-bottom:18px;font-size:13px;color:var(--text);" id="dup-info"></div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:18px;">¿Qué deseas hacer con las <strong id="dup-nueva-cant"></strong> unidades nuevas?</p>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button id="dup-sumar" class="btn btn-success" style="justify-content:center;"><i data-lucide="plus-circle"></i> Sumar al stock existente</button>
+      <button id="dup-crear" class="btn btn-ghost" style="justify-content:center;"><i data-lucide="copy"></i> Crear entrada separada de todas formas</button>
+      <button id="dup-cancelar" class="btn btn-ghost" style="justify-content:center;color:var(--muted)"><i data-lucide="x"></i> Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:380px;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--red-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i data-lucide="trash-2" style="width:18px;height:18px;color:var(--red);"></i>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">Confirmar eliminación</div>
+        <div id="confirm-msg" style="font-size:13px;color:var(--text2);margin-top:2px"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button id="confirm-cancel" class="btn btn-ghost">Cancelar</button>
+      <button id="confirm-ok" class="btn btn-del">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
