@@ -206,15 +206,21 @@ function _procesarVenta(notas) {
   }
 
   var n = carrito.length;
+  var savedTicketId = ticketId;
   saveInventario(inv);
   saveVentas(ventas);
+
+  // programar comprobante ANTES de cualquier render que pueda fallar
+  setTimeout(function() {
+    try { verComprobante(savedTicketId); } catch(e) {}
+  }, 500);
+
   cancelarVenta();
   renderInventario();
   renderVentas();
-  renderReportes();
+  try { renderReportes(); } catch(e) {}
   filtrarProductos();
   toast('Venta de ' + n + ' producto(s) registrada.');
-  verComprobante(ticketId);
 }
 
 function renderVentas() {
@@ -254,10 +260,10 @@ function renderVentas() {
         '</button></td></tr>' : '';
       return ticketRow + '<tr style="' + (v.anulada?'opacity:.45;text-decoration:line-through;':'') + '">' +
         '<td style="color:var(--muted)">' + v.fecha + '</td>' +
-        '<td class="td-main">' + v.prenda + '</td>' +
+        '<td class="td-main">' + v.prenda + (v.notas ? '<div style="font-size:11px;color:var(--muted);font-weight:400;margin-top:2px;text-decoration:none;">' + v.notas + '</div>' : '') + '</td>' +
         '<td>' + v.talla + '</td><td>' + v.cantidad + '</td>' +
-        '<td>' + fmt(v.compra) + '</td><td>' + fmt(v.venta) + '</td>' +
-        '<td style="font-weight:600">' + fmt(v.total) + '</td>' +
+        '<td>' + fmt(v.compra) + '</td><td style="' + (v.descuento > 0 ? 'color:var(--red);font-weight:700;' : '') + '">' + fmt(v.venta) + (v.descuento > 0 ? ' <span style="font-size:10px;opacity:.7">↓</span>' : '') + '</td>' +
+        '<td><span style="font-weight:700;font-size:13px;color:var(--text);background:var(--accent-soft);padding:4px 10px;border-radius:8px;display:inline-block;">' + fmt(v.total) + '</span></td>' +
         '<td style="color:' + (v.anulada?'var(--muted)':'var(--green)') + ';font-weight:700">' + (v.anulada?'Anulada':'+'+fmt(v.ganancia)) + '</td>' +
         '<td>' + (v.anulada
           ? '<span class="badge badge-red"><span class="badge-dot"></span>Anulada</span>'
