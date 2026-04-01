@@ -83,7 +83,7 @@
 
     <!-- Logo -->
     <div style="margin-bottom:24px;">
-      <img src="logo_venta.png" alt="Juth Sales" style="width:280px;height:280px;object-fit:contain;border-radius:32px;"
+      <img src="logo_venta.png" alt="Juth Sales" style="width:280px;height:280px;max-width:60vw;max-height:60vw;object-fit:contain;border-radius:32px;"
            onerror="this.style.display='none';document.getElementById('home-logo-fallback').style.display='flex'"/>
       <div id="home-logo-fallback" style="display:none;width:280px;height:280px;border-radius:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));align-items:center;justify-content:center;margin:0 auto;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -305,7 +305,7 @@
           </div>
           <div id="v-producto-info" class="product-card" style="margin-bottom:14px;"></div>
           <div class="info-banner" id="v-costo-banner" style="margin-bottom:14px;"><i data-lucide="info"></i><span id="v-costo-text"></span></div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;">
+          <div class="form-grid" style="margin-bottom:16px;">
             <div class="field" style="margin:0;">
               <label>Cantidad</label>
               <div class="input-wrap"><i data-lucide="hash"></i><input id="v-cantidad" type="number" value="1" min="1" oninput="calcularVenta()"/></div>
@@ -585,7 +585,7 @@
 </footer>
 
 <!-- MODAL COMPROBANTE -->
-<div id="comp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+<div id="comp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:360px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);" id="comp-printable">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);">
       <span style="font-size:13px;font-weight:700;color:var(--text)">Comprobante</span>
