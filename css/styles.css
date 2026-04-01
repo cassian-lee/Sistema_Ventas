@@ -462,10 +462,11 @@
       .main { margin-left:0; padding-top: var(--nav-h); }
       .page { padding:20px 16px; }
       .cards { grid-template-columns:repeat(2,1fr); gap:10px; }
-      .c-val { font-size:22px; }
+      .c-val { font-size:20px; }
       .form-grid { grid-template-columns:1fr; }
+      .search-field { width:100%; }
       .search-field input { width:100%; }
-      .table-toolbar { flex-direction:column; align-items:stretch; }
+      .table-toolbar { flex-direction:column; align-items:stretch; gap:10px; }
       .page-header { flex-direction:column; }
       .filter-bar { flex-direction:column; }
       .report-grid { grid-template-columns:1fr; }
@@ -473,9 +474,13 @@
       .search-row > .field { min-width:unset; }
       .product-card { grid-template-columns:repeat(2,1fr); }
       .box { padding:18px 16px; }
+      .ventas-layout { grid-template-columns:1fr !important; }
+      .td-actions { flex-wrap:wrap; }
+      .btn-sm { padding:4px 8px; font-size:11px; }
     }
     @media (max-width: 400px) {
       .cards { grid-template-columns:1fr; }
+      .product-card { grid-template-columns:1fr; }
     }
     @media print {
       .sidebar, .topbar, #app-footer, #toast-container,
