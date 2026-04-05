@@ -12,3 +12,9 @@ function saveReposiciones(d) { localStorage.setItem(LS_REP, JSON.stringify(d)); 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 function fmt(n) { return 'S/ ' + parseFloat(n||0).toFixed(2); }
 function norm(s) { return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+
+function capitalize(s) {
+  s = String(s || '').trim();
+  if (!s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}

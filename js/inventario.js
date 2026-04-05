@@ -101,14 +101,25 @@ function openModal(id) {
 
   // poblar sugerencias desde inventario existente
   var inv = getInventario();
-  var modelos = [];
-  var modeloSet = new Set();
-  inv.forEach(function(p) { if (p.modelo && !modeloSet.has(p.modelo)) { modeloSet.add(p.modelo); modelos.push(p.modelo); } });
-  var colores = [];
-  var colorSet = new Set();
-  inv.forEach(function(p) { if (p.color && !colorSet.has(p.color)) { colorSet.add(p.color); colores.push(p.color); } });
-  document.getElementById('dl-modelos').innerHTML = modelos.map(function(m) { return '<option value="' + m + '">'; }).join('');
-  document.getElementById('dl-colores').innerHTML = colores.map(function(c) { return '<option value="' + c + '">'; }).join('');
+  var tipoSet = new Set(), marcaSet = new Set(), modeloSet = new Set(), tallaSet = new Set(), colorSet = new Set();
+  inv.forEach(function(p) {
+    if (p.tipo) tipoSet.add(p.tipo);
+    if (p.marca) marcaSet.add(p.marca);
+    if (p.modelo) modeloSet.add(p.modelo);
+    if (p.talla) tallaSet.add(p.talla);
+    if (p.color) colorSet.add(p.color);
+  });
+  // agregar opciones por defecto
+  ['Camiseta','Chaqueta','Falda','Pantalón','Shorts','Vestido','Zapatos'].forEach(function(t) { tipoSet.add(t); });
+  ['XS','S','M','L','XL','XXL','28','30','32','34','Única'].forEach(function(t) { tallaSet.add(t); });
+  // ordenar y llenar datalists
+  var sortArr = function(set) { return Array.from(set).sort(function(a,b) { return a.localeCompare(b, 'es'); }); };
+  var toOpts = function(arr) { return arr.map(function(v) { return '<option value="' + v + '">'; }).join(''); };
+  document.getElementById('dl-tipos').innerHTML   = toOpts(sortArr(tipoSet));
+  document.getElementById('dl-marcas').innerHTML   = toOpts(sortArr(marcaSet));
+  document.getElementById('dl-modelos').innerHTML = toOpts(sortArr(modeloSet));
+  document.getElementById('dl-tallas').innerHTML  = toOpts(sortArr(tallaSet));
+  document.getElementById('dl-colores').innerHTML = toOpts(sortArr(colorSet));
   if (id) {
     var p = getInventario().find(function(x) { return x.id === id; });
     document.getElementById('modal-title').textContent = 'Editar prenda';
@@ -139,11 +150,11 @@ function huella(p) {
 }
 
 function guardarPrenda() {
-  var tipo     = document.getElementById('f-tipo').value;
-  var marca    = document.getElementById('f-marca').value.trim();
-  var modelo   = document.getElementById('f-modelo').value.trim();
-  var talla    = document.getElementById('f-talla').value;
-  var color    = document.getElementById('f-color').value.trim();
+  var tipo     = capitalize(document.getElementById('f-tipo').value);
+  var marca    = capitalize(document.getElementById('f-marca').value);
+  var modelo   = capitalize(document.getElementById('f-modelo').value);
+  var talla    = document.getElementById('f-talla').value.trim().toUpperCase();
+  var color    = capitalize(document.getElementById('f-color').value);
   var cantidad = parseInt(document.getElementById('f-cantidad').value);
   var compra   = parseFloat(document.getElementById('f-compra').value);
   var venta    = parseFloat(document.getElementById('f-venta').value);

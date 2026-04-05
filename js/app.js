@@ -59,6 +59,72 @@ function updateThemeIcons(isDark) {
   lucide.createIcons();
 }
 
+// ── BACKUP / RESTORE ──
+function exportarDatos() {
+  var data = {
+    version: '1.0',
+    fecha: new Date().toISOString(),
+    inventario: getInventario(),
+    ventas: getVentas(),
+    reposiciones: getReposiciones()
+  };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'juth-sales-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Backup descargado correctamente.');
+}
+
+function importarDatos(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      if (!data.inventario || !data.ventas) {
+        toast('Archivo inválido. No contiene datos reconocibles.', 'error');
+        return;
+      }
+      showConfirm('Esto reemplazará todos tus datos actuales con los del backup. ¿Continuar?', function() {
+        saveInventario(data.inventario);
+        saveVentas(data.ventas);
+        if (data.reposiciones) saveReposiciones(data.reposiciones);
+        renderInventario();
+        renderVentas();
+        renderCarrito();
+        renderReposiciones();
+        filtrarProductos();
+        filtrarReposicion();
+        toast('Datos restaurados correctamente.');
+      }, { title: 'Restaurar backup', okLabel: 'Restaurar', okClass: 'btn-primary' });
+    } catch(err) {
+      toast('Error al leer el archivo.', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function borrarTodosDatos() {
+  showConfirm('¿Borrar TODOS los datos? Inventario, ventas y reposiciones se eliminarán permanentemente.', function() {
+    saveInventario([]);
+    saveVentas([]);
+    saveReposiciones([]);
+    localStorage.removeItem('juth_seeded');
+    renderInventario();
+    renderVentas();
+    renderCarrito();
+    renderReposiciones();
+    filtrarProductos();
+    filtrarReposicion();
+    toast('Todos los datos han sido eliminados.', 'info');
+  });
+}
+
 // ── INIT ──
 function init() {
   // restaurar tema
