@@ -44,7 +44,7 @@
       <i data-lucide="package-plus"></i> Reposición
     </button>
     <div class="nav-section-label" style="margin-top:12px">Cuenta</div>
-    <button class="nav-item">
+    <button class="nav-item" onclick="showPage('config',this)" id="nav-config">
       <i data-lucide="settings"></i> Configuración
     </button>
   </nav>
@@ -219,11 +219,13 @@
     <div class="form-grid">
       <div class="field">
         <label>Tipo de prenda</label>
-        <select id="f-tipo"><option value="">-- Seleccionar --</option><option>Camiseta</option><option>Pantalón</option><option>Vestido</option><option>Chaqueta</option><option>Falda</option><option>Shorts</option><option>Zapatos</option><option>Otro</option></select>
+        <div class="input-wrap"><i data-lucide="shirt"></i><input id="f-tipo" type="text" placeholder="Ej: Camiseta, Pantalón..." list="dl-tipos" autocomplete="off"/></div>
+        <datalist id="dl-tipos"><option value="Camiseta"><option value="Pantalón"><option value="Vestido"><option value="Chaqueta"><option value="Falda"><option value="Shorts"><option value="Zapatos"></datalist>
       </div>
       <div class="field">
         <label>Marca</label>
-        <div class="input-wrap"><i data-lucide="award"></i><input id="f-marca" type="text" placeholder="Ej: Nike, Zara..."/></div>
+        <div class="input-wrap"><i data-lucide="award"></i><input id="f-marca" type="text" placeholder="Ej: Nike, Zara..." list="dl-marcas" autocomplete="off"/></div>
+        <datalist id="dl-marcas"></datalist>
       </div>
       <div class="field">
         <label>Modelo</label>
@@ -232,7 +234,8 @@
       </div>
       <div class="field">
         <label>Talla</label>
-        <select id="f-talla"><option value="">-- Seleccionar --</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>28</option><option>30</option><option>32</option><option>34</option><option>Única</option></select>
+        <div class="input-wrap"><i data-lucide="ruler"></i><input id="f-talla" type="text" placeholder="Ej: M, L, 32..." list="dl-tallas" autocomplete="off"/></div>
+        <datalist id="dl-tallas"><option value="XS"><option value="S"><option value="M"><option value="L"><option value="XL"><option value="XXL"><option value="28"><option value="30"><option value="32"><option value="34"><option value="Única"></datalist>
       </div>
       <div class="field">
         <label>Color</label>
@@ -570,6 +573,64 @@
         <thead><tr><th>Fecha</th><th>Prenda</th><th>Talla</th><th>Cant. ingresada</th><th>P. Compra</th><th>Notas</th></tr></thead>
         <tbody id="rep-tbody"></tbody>
       </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONFIGURACIÓN ===== -->
+<section id="config" class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Configuración</h1>
+      <p class="page-subtitle">Respaldo y restauración de datos</p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
+    <div class="box" style="margin-bottom:0;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div style="width:42px;height:42px;border-radius:11px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i data-lucide="download" style="width:20px;height:20px;color:var(--green);"></i>
+        </div>
+        <div>
+          <div class="box-title">Exportar datos</div>
+          <div class="box-subtitle">Descarga un archivo con todo tu inventario, ventas y reposiciones</div>
+        </div>
+      </div>
+      <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="exportarDatos()">
+        <i data-lucide="download"></i> Descargar backup (.json)
+      </button>
+    </div>
+
+    <div class="box" style="margin-bottom:0;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div style="width:42px;height:42px;border-radius:11px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i data-lucide="upload" style="width:20px;height:20px;color:var(--accent);"></i>
+        </div>
+        <div>
+          <div class="box-title">Importar datos</div>
+          <div class="box-subtitle">Restaura tus datos desde un archivo de backup</div>
+        </div>
+      </div>
+      <label class="btn btn-primary" style="width:100%;justify-content:center;cursor:pointer;">
+        <i data-lucide="upload"></i> Seleccionar archivo (.json)
+        <input type="file" accept=".json" onchange="importarDatos(event)" style="display:none;"/>
+      </label>
+    </div>
+
+    <div class="box" style="margin-bottom:0;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div style="width:42px;height:42px;border-radius:11px;background:var(--red-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i data-lucide="trash-2" style="width:20px;height:20px;color:var(--red);"></i>
+        </div>
+        <div>
+          <div class="box-title">Borrar todos los datos</div>
+          <div class="box-subtitle">Elimina inventario, ventas y reposiciones. Esta acción no se puede deshacer.</div>
+        </div>
+      </div>
+      <button class="btn btn-del" style="width:100%;justify-content:center;" onclick="borrarTodosDatos()">
+        <i data-lucide="trash-2"></i> Borrar todo
+      </button>
     </div>
   </div>
 </section>
